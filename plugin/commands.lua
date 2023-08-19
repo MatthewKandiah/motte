@@ -27,16 +27,23 @@ local function open_notes_buffer()
 	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
 end
 
+local function add_new_note_to_buffer(note_text)
+	vim.api.nvim_set_option_value('modifiable', 1, { buf = NOTES_BUFFER_NUMBER })
+	vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, false, { note_text })
+	NEXT_NOTE_LINE_NUMBER = NEXT_NOTE_LINE_NUMBER + 1
+	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
+end
+
 local function create_new_note()
 	if not is_notes_buffer_open() then
 		print('Cannot create note before notes buffer opened, try :NotesStart')
 		return
 	end
-	-- open dialog with field, close dialog on enter and return text, add note to NOTES with source location and update notes buffer
-	vim.api.nvim_set_option_value('modifiable', 1, { buf = NOTES_BUFFER_NUMBER })
-	vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, false, {'new note text'})
-	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
-
+	vim.ui.input({ prompt = 'Note: ' }, function(input)
+		if input ~= nil and input ~= '' then
+			add_new_note_to_buffer(input)
+		end
+	end)
 end
 
 vim.api.nvim_create_user_command('NotesStart', open_notes_buffer, {})
