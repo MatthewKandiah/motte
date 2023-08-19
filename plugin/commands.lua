@@ -1,5 +1,7 @@
 local NOTES_BUFFER_NUMBER = nil;
 
+local NEXT_NOTE_LINE_NUMBER = 0;
+
 local function reset_notes_buffer_number()
 	NOTES_BUFFER_NUMBER = nil
 end
@@ -31,7 +33,10 @@ local function create_new_note()
 		return
 	end
 	-- open dialog with field, close dialog on enter and return text, add note to NOTES with source location and update notes buffer
-	print('now post a new note')
+	vim.api.nvim_set_option_value('modifiable', 1, { buf = NOTES_BUFFER_NUMBER })
+	vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, false, {'new note text'})
+	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
+
 end
 
 vim.api.nvim_create_user_command('NotesStart', open_notes_buffer, {})
