@@ -2,15 +2,16 @@ local NOTES_BUFFER_NUMBER = nil;
 
 local NEXT_NOTE_LINE_NUMBER = 0;
 
-local function reset_notes_buffer_number()
-	NOTES_BUFFER_NUMBER = nil
-end
+-- a note is a table containing:
+-- text = string
+local NOTES = {}
 
 local function reset()
 	if NOTES_BUFFER_NUMBER ~= nil then
 		vim.api.nvim_buf_delete(NOTES_BUFFER_NUMBER, { force = true });
-		reset_notes_buffer_number();
 	end
+	NOTES = {}
+	NOTES_BUFFER_NUMBER = nil
 end
 
 local function is_notes_buffer_open()
@@ -27,10 +28,14 @@ local function open_notes_buffer()
 	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
 end
 
-local function add_new_note_to_buffer(note_text)
+local function update_notes_buffer()
 	vim.api.nvim_set_option_value('modifiable', 1, { buf = NOTES_BUFFER_NUMBER })
-	vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, false, { note_text })
-	NEXT_NOTE_LINE_NUMBER = NEXT_NOTE_LINE_NUMBER + 1
+	vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, 0, -1, false, {})
+	NEXT_NOTE_LINE_NUMBER = 0
+	for i = 1, #NOTES do
+		vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, false, {NOTES[i].text})
+		NEXT_NOTE_LINE_NUMBER = NEXT_NOTE_LINE_NUMBER + 1
+	end
 	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
 end
 
@@ -41,7 +46,8 @@ local function create_new_note()
 	end
 	vim.ui.input({ prompt = 'Note: ' }, function(input)
 		if input ~= nil and input ~= '' then
-			add_new_note_to_buffer(input)
+			table.insert(NOTES, { text = input })
+			update_notes_buffer()
 		end
 	end)
 end
