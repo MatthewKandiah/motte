@@ -33,8 +33,9 @@ local function update_notes_buffer()
 	vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, 0, -1, false, {})
 	NEXT_NOTE_LINE_NUMBER = 0
 	for i = 1, #NOTES do
-		vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, false, {NOTES[i].text})
-		NEXT_NOTE_LINE_NUMBER = NEXT_NOTE_LINE_NUMBER + 1
+		vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER, NEXT_NOTE_LINE_NUMBER, true, {i .. '. ' .. NOTES[i].text})
+		vim.api.nvim_buf_set_lines(NOTES_BUFFER_NUMBER, NEXT_NOTE_LINE_NUMBER + 1, NEXT_NOTE_LINE_NUMBER + 1, true, {''})
+		NEXT_NOTE_LINE_NUMBER = NEXT_NOTE_LINE_NUMBER + 2
 	end
 	vim.api.nvim_set_option_value('modifiable', 0, { buf = NOTES_BUFFER_NUMBER })
 end
