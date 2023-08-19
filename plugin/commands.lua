@@ -53,7 +53,17 @@ local function create_new_note()
 	end)
 end
 
+local function delete_note(number)
+	if tonumber(number) <= #NOTES then
+		table.remove(NOTES, number)
+		update_notes_buffer()
+	else
+		print('ERROR: attempting to delete note ' .. number .. ' when only ' .. #NOTES .. 'notes exist')
+	end
+end
+
 vim.api.nvim_create_user_command('NotesStart', open_notes_buffer, {})
 vim.api.nvim_create_user_command('NewNote', create_new_note, {})
+vim.api.nvim_create_user_command('DelNote', function() vim.ui.input({ prompt = 'Number: ' }, delete_note) end, {})
 
 vim.api.nvim_create_autocmd('QuitPre', { callback = reset, buffer = NOTES_BUFFER_NUMBER })
